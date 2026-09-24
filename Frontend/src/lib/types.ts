@@ -2,8 +2,8 @@ export type CabinClass = "economy" | "premium" | "business" | "first";
 
 export interface PassengerInput {
   type: "adult" | "child" | "infant";
-  firstName: string;
-  lastName: string;
+  fullName: string;
+  age?: number;
 }
 
 export interface FlightResult {
