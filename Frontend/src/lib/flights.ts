@@ -1,7 +1,8 @@
 // ============================================
-// flights/data.ts
+// src/lib/flights.ts
 // ============================================
 
+import type { Cabin } from "@/lib/airports";
 import type { CabinClass, FlightResult, PassengerCounts, SelectedFlight } from "@/lib/types";
 
 export type SectionKey = "popular" | "escapes" | "longhaul" | "nextmonth";
@@ -9,6 +10,32 @@ export type SectionKey = "popular" | "escapes" | "longhaul" | "nextmonth";
 // ============================================
 // الدوال المساعدة
 // ============================================
+
+export async function searchFlights(params: {
+  from: string;
+  to: string;
+  date: string;
+  adults: number;
+  children: number;
+  infants: number;
+  cabin: Cabin;
+}): Promise<FlightResult[]> {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (!base) throw new Error("NEXT_PUBLIC_API_URL is not defined");
+
+  const url = new URL(`${base}/api/search`);
+  url.searchParams.set("from", params.from);
+  url.searchParams.set("to", params.to);
+  url.searchParams.set("date", params.date);
+  url.searchParams.set("adults", String(params.adults));
+  url.searchParams.set("children", String(params.children));
+  url.searchParams.set("infants", String(params.infants));
+  url.searchParams.set("cabin", params.cabin);
+
+  const res = await fetch(url.toString());
+  if (!res.ok) throw new Error("Failed to fetch flights");
+  return res.json();
+}
 
 export function getFlightById(offerId: string | null | undefined, flights: Record<string, FlightResult>) {
   if (!offerId) return null;

@@ -4,7 +4,45 @@ export interface PassengerInput {
   type: "adult" | "child" | "infant";
   firstName: string;
   lastName: string;
-  // أضف الحقول التي يحتاجها تطبيقك
+}
+
+export interface FlightResult {
+  id: string;
+  airlineCode: string;
+  airlineName: string;
+  flightNumber: string;
+  fromCode: string;
+  fromCity: string;
+  toCode: string;
+  toCity: string;
+  departTime: string;
+  arriveTime: string;
+  duration: string;
+  stops: number;
+  priceCents: number;
+  cabin: CabinClass;
+  co2Kg: number;
+}
+
+export interface PassengerCounts {
+  adults: number;
+  children: number;
+  infants: number;
+}
+
+export interface SelectedFlight {
+  offerId: string;
+  origin: string;
+  destination: string;
+  originCity: string;
+  destinationCity: string;
+  departTime: string;
+  arriveTime: string;
+  duration: string;
+  cabinClass: CabinClass;
+  priceCents: number;
+  currency: string;
+  airlineName: string;
 }
 
 export interface BookingRequestBody {
