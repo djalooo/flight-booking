@@ -7,8 +7,6 @@ import { ArrowLeft, Warning } from "@/components/icons";
 import {
   buildPassengerList,
   clearSelectedFlight,
-  getDefaultFlight,
-  getFlightById,
   loadSelectedFlight,
   parsePassengerCounts,
 } from "@/lib/flights";
@@ -39,14 +37,6 @@ type SubmitState =
   | { status: "submitting" }
   | { status: "error"; message: string };
 
-function parseDurationToMinutes(durationStr: string): number {
-  const hoursMatch = durationStr.match(/(\d+)\s*h/i);
-  const minutesMatch = durationStr.match(/(\d+)\s*m/i);
-  const hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
-  const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
-  return hours * 60 + minutes;
-}
-
 export function BookPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -60,40 +50,31 @@ export function BookPageClient() {
   const departureDate = searchParams.get("date") ?? DEFAULT_DEPARTURE_DATE;
 
   const [sessionFlight, setSessionFlight] = useState<SelectedFlight | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const saved = loadSelectedFlight();
     if (saved && (!offerId || saved.offerId === offerId)) {
       setSessionFlight(saved);
+    } else {
+      setNotFound(true);
     }
   }, [offerId]);
 
   const flight = useMemo(() => {
-    if (sessionFlight) {
-      return {
-        id: sessionFlight.offerId,
-        fromCode: sessionFlight.origin,
-        toCode: sessionFlight.destination,
-        departTime: sessionFlight.departTime,
-        arriveTime: sessionFlight.arriveTime,
-        duration: sessionFlight.duration,
-        cabin: sessionFlight.cabinClass,
-        priceCents: sessionFlight.priceCents,
-        airlineName: sessionFlight.airlineName,
-      };
-    }
-    const fallback = getFlightById(offerId) ?? getDefaultFlight();
+    if (!sessionFlight) return null;
     return {
-      id: fallback.id,
-      fromCode: fallback.fromCode,
-      toCode: fallback.toCode,
-      departTime: fallback.departTime,
-      arriveTime: fallback.arriveTime,
-      duration: fallback.duration,
-      cabin: fallback.cabin,
-      priceCents: fallback.priceCents,
+      id: sessionFlight.offerId,
+      fromCode: sessionFlight.origin,
+      toCode: sessionFlight.destination,
+      departTime: sessionFlight.departTime,
+      arriveTime: sessionFlight.arriveTime,
+      duration: sessionFlight.duration,
+      cabin: sessionFlight.cabinClass,
+      priceCents: sessionFlight.priceCents,
+      airlineName: sessionFlight.airlineName,
     };
-  }, [sessionFlight, offerId]);
+  }, [sessionFlight]);
 
   const passengerSlots = useMemo(() => buildPassengerList(counts), [counts]);
 
@@ -109,11 +90,13 @@ export function BookPageClient() {
   const [email, setEmail] = useState("");
   const [submit, setSubmit] = useState<SubmitState>({ status: "idle" });
 
-  // حساب السعر الفعلي بدون أي تعديل أو تخفيض على الركاب
-  const totalCents = flight.priceCents * (counts.adults + counts.children + counts.infants);
+  const totalCents = flight
+    ? flight.priceCents * (counts.adults + counts.children + counts.infants)
+    : 0;
 
-  // حساب تواريخ الإقلاع والوصول بدقة فائقة وترحيل اليوم للرحلات الليلية
   const { takeoffTime, arrivalTime } = useMemo(() => {
+    if (!flight) return { takeoffTime: "", arrivalTime: "" };
+
     const baseDate = new Date(`${departureDate}T00:00:00Z`);
     const [depH, depM] = flight.departTime.split(":").map(Number);
     const [arrH, arrM] = flight.arriveTime.split(":").map(Number);
@@ -132,7 +115,7 @@ export function BookPageClient() {
       takeoffTime: depDate.toISOString(),
       arrivalTime: arrDate.toISOString(),
     };
-  }, [departureDate, flight.departTime, flight.arriveTime]);
+  }, [departureDate, flight]);
 
   function updatePassenger(index: number, patch: Partial<PassengerFormState>) {
     setPassengers((current) =>
@@ -142,7 +125,7 @@ export function BookPageClient() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (submit.status === "submitting") return;
+    if (submit.status === "submitting" || !flight) return;
 
     const trimmedPhone = phone.trim();
     if (!trimmedPhone) {
@@ -218,6 +201,23 @@ export function BookPageClient() {
             err instanceof Error ? err.message : "Unable to complete booking.",
         });
       });
+  }
+
+  if (notFound && !sessionFlight) {
+    return (
+      <div className="page-gutter mx-auto max-w-[1440px] py-8">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 rounded-full py-2 text-body font-medium text-hof transition-colors hover:text-foggy"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to search
+        </Link>
+        <p className="mt-8 text-body text-foggy">
+          No flight selected. Please go back and choose a flight.
+        </p>
+      </div>
+    );
   }
 
   return (
