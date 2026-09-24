@@ -23,7 +23,7 @@ export async function searchFlights(params: {
   const base = process.env.NEXT_PUBLIC_API_URL;
   if (!base) throw new Error("NEXT_PUBLIC_API_URL is not defined");
 
-  const url = new URL(`${base}/api/search`);
+  const url = new URL(`${base}/api/v1/flights/search`);
   url.searchParams.set("from", params.from);
   url.searchParams.set("to", params.to);
   url.searchParams.set("date", params.date);
