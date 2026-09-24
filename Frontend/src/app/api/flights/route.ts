@@ -38,7 +38,18 @@ export async function GET(req: Request) {
   const delay = Math.min(1200, 450 + Math.random() * 500);
   await new Promise((r) => setTimeout(r, delay));
 
-  const flights = await searchFlights({ from, to, date, adults, children, infants, cabin });
+  const backendUrl = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/flights/search`);
+  backendUrl.searchParams.set("from", from);
+  backendUrl.searchParams.set("to", to);
+  backendUrl.searchParams.set("date", date);
+  backendUrl.searchParams.set("adults", String(adults));
+  backendUrl.searchParams.set("children", String(children));
+  backendUrl.searchParams.set("infants", String(infants));
+  backendUrl.searchParams.set("cabin", cabin);
+
+  const backendRes = await fetch(backendUrl.toString());
+  if (!backendRes.ok) throw new Error("Failed to fetch flights from backend");
+  const flights = await backendRes.json();
   return Response.json({
     flights,
     meta: { from, to, date, adults, children, infants, cabin, count: flights.length },
