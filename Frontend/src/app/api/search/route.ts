@@ -29,7 +29,10 @@ export async function GET(req: NextRequest) {
       cabin,
     });
 
-    const backendRes = await fetch(`http://localhost:3001/api/v1/flights/search?${query.toString()}`, {
+
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:3001";
+
+    const backendRes = await fetch(`${backendUrl}/api/v1/flights/search?${query.toString()}`, {
       cache: "no-store",
     });
 
