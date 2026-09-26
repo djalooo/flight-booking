@@ -44,10 +44,11 @@ export async function GET(req: NextRequest) {
     
     // إرجاع البيانات الناتجة عن NestJS إلى الـ Frontend
     return NextResponse.json({ flights: data });
-  } catch (error) {
-    console.error("Search API Error:", error);
+    } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Search API Error:", message);
     return NextResponse.json(
-      { error: "Failed to fetch flights from backend" },
+      { error: message },
       { status: 500 }
     );
   }
