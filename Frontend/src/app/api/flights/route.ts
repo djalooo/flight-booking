@@ -38,6 +38,8 @@ export async function GET(req: NextRequest) {
     }
 
     const data = await backendRes.json();
+    
+    // ✅ الـ backend يعيد array مباشرة، نغلفه في object
     return NextResponse.json({ flights: data });
   } catch (error) {
     console.error("Search API Error:", error);
