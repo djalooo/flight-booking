@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
   console.log("🚀 About to fetch NestJS...");
   try {
-    const upstream = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/bookings`, {
+    const upstream = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/bookings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
