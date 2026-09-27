@@ -5,8 +5,8 @@ import type { BookingRequestBody, BookingResponse, CabinClass } from "@/lib/type
 
 export const dynamic = "force-dynamic";
 
-const NESTJS_BACKEND_URL =
-  process.env.NESTJS_BACKEND_URL ?? "http://localhost:3001/api/v1";
+const BACKEND_URL =
+  process.env.BACKEND_URL ?? "http://localhost:3001/api/v1";
 
 const VALID_CABIN_CLASSES: CabinClass[] = ["economy", "premium", "business", "first"];
 
@@ -28,14 +28,14 @@ export async function POST(request: NextRequest) {
 
   console.log("🚀 About to fetch NestJS...");
   try {
-    const upstream = await fetch(`${NESTJS_BACKEND_URL.replace(/\/$/, "")}/bookings`, {
+    const upstream = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/bookings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(30000),
     });
 
     console.log("📡 NestJS response status:", upstream.status);

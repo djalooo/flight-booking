@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     }
 
     const backendUrl = new URL(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/flights/search`
+      `${process.env.BACKEND_URL}/api/v1/flights/search`
     );
     backendUrl.searchParams.set("from", from);
     backendUrl.searchParams.set("to", to);

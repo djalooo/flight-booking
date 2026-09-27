@@ -96,7 +96,7 @@ export default function AdminDashboard() {
 
   const loadBookings = useCallback(async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings`);
+      const res = await fetch(`${process.env.BACKEND_URL}/bookings`);
       if (!res.ok) throw new Error("Failed to load bookings");
       setBookings(await res.json());
       setError(null);
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
   async function updateStatus(id: string, status: string) {
     setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)));
     setSelected((s) => (s && s.id === id ? { ...s, status } : s));
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/${id}`, {
+    const res = await fetch(`${process.env.BACKEND_URL}/bookings/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -167,7 +167,7 @@ export default function AdminDashboard() {
     setBookings((prev) => prev.filter((b) => b.id !== id));
     setSelected((s) => (s && s.id === id ? null : s));
     setDeleteTarget(null);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/${id}`, {
+    const res = await fetch(`${process.env.BACKEND_URL}/bookings/${id}`, {
       method: "DELETE",
     });
     if (!res.ok) await loadBookings();
