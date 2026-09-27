@@ -172,7 +172,7 @@ export function BookPageClient() {
       })),
     };
 
-    fetch("/api/booking", {
+    fetch("/api/bookings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
