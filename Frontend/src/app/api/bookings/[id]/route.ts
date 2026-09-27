@@ -1,3 +1,4 @@
+//
 import { randomUUID } from "node:crypto";
 import type { NextRequest } from "next/server";
 import type { BookingRequestBody, BookingResponse, CabinClass } from "@/lib/types";
